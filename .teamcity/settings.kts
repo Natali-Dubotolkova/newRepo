@@ -1,5 +1,6 @@
 import jetbrains.buildServer.configs.kotlin.v2019_2.*
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.dotnetBuild
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.powerShell
 import jetbrains.buildServer.configs.kotlin.v2019_2.projectFeatures.buildReportTab
 import jetbrains.buildServer.configs.kotlin.v2019_2.vcs.GitVcsRoot
 
@@ -68,6 +69,16 @@ object ProjectName_BuildConf : BuildType({
         dotnetBuild {
             projects = "workingDirectory/solutionName"
             param("dotNetCoverage.dotCover.home.path", "%teamcity.tool.JetBrains.dotCover.CommandLineTools.DEFAULT%")
+        }
+        powerShell {
+            name = "setBN"
+            scriptMode = script {
+                content = """
+                    ${'$'}BuildNumber = Get-Date -format "yyyy.MM.dd"
+                     
+                    Write-Host "##teamcity[buildNumber '${'$'}BuildNumber']"
+                """.trimIndent()
+            }
         }
     }
 })
